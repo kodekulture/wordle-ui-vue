@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import {useLocalStorage} from '@vueuse/core';
 import {authFactory} from '~/api/auth';
-import {computed, ref} from '#imports'
+import {computed, ref, useLocalStorage } from '#imports'
 
 export const useAuthStore = defineStore('useAuthStore', () => {
   const token = useLocalStorage<string | null>('x-token', null);

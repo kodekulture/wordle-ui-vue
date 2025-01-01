@@ -1,49 +1,55 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
-import {ref, navigateTo} from '#imports';
-import { useAuthStore } from '~/stores/authStore';
+import { ref, navigateTo, definePageMeta, useToast } from '#imports';
+import { useAuthStore } from '#imports';
 const obj = ref({
     username: '', password: ''
 })
 const store = useAuthStore();
-const {loading, isLoggedIn, error} = storeToRefs(store);
+const toast = useToast()
+const { loading, isLoggedIn, error } = storeToRefs(store);
 async function register() {
     const v = obj.value
     await store.register(v.username, v.password);
-    if (isLoggedIn) {
+    if (isLoggedIn.value) {
         navigateTo('/')
+    }
+    if (error.value) {
+        toast.add({title: error.value, icon:'i-heroicons-solid-exclamation-triangle', color:'red'})
     }
 }
 const toLogin = () => navigateTo('/login')
+
+definePageMeta({
+    layout: 'auth'
+})
+
 </script>
 <template>
-    <div class="w-full h-full flex justify-center items-center">
-    <div class="content-center">
-        <h1> Register in Wordle With Friends </h1>
+    <div class="small-box">
+        <h1 class="flex"> Register in Wordle With Friends </h1>
         <form @submit.prevent="register">
-            <div class="w-50 center">
+            <div class="flex flex-col my-4 justify-center items-center">
+            <div class="my-2">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" v-model="obj.username">
+                <UInput type="text" id="username" name="username" v-model="obj.username" />
             </div>
-            <div class="p-2">
+            <div class="mb-8">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" v-model = 'obj.password'>
+                <UInput type="password" id="password" name="password" v-model='obj.password' />
             </div>
-            <div>
-                <Button type="submit" :disabled="loading">Register</Button>
-            </div>
+            <UButton type="submit" :disabled="loading" class="w-44 justify-center">Register</UButton>
+        </div>
         </form>
-        <Button @click="toLogin"> Login instead? </Button>
+        <UButton @click="toLogin" class="w-44 justify-center">Login instead?</UButton>
     </div>
-</div>
 </template>
 
-<style scoped>
+<style>
 h1 {
-    @apply text-2xl
+    @apply text-2xl;
 }
-
-input {
-    @apply p-2 m-2 rounded-md border border-black
+.small-box {
+    @apply flex h-full w-full lg:h-2/3 lg:w-1/3 border-solid border-2 flex-col justify-center items-center;
 }
 </style>

@@ -5,22 +5,29 @@ import {resolve} from 'path';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: {
-    enabled: true,
-
+    enabled: false,
     timeline: {
-      enabled: true,
+      enabled: false,
     },
   },
+  runtimeConfig: {
+    public: {
+      baseURL: 'http://localhost:9000'
+    }
+  },
+  css: ['~/assets/main.css'],
   alias: {
     "@": resolve(__dirname, '/'),
   },
-  modules: ["@pinia/nuxt", "@vueuse/nuxt"],
-  css: ['~/assets/main.css'],
+  modules: ["@pinia/nuxt", "@vueuse/nuxt", '@nuxt/ui', "@nuxtjs/tailwindcss"],
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
+  // ui: {
+  //   safelistColors: ['black'],
+  // },
   ssr: false,
 })

@@ -13,6 +13,7 @@ DefaultT = unknown,
   opts?: O,
 ) {
   const auth = useAuthStore()
+  const config = useRuntimeConfig()
   const { bearer } = storeToRefs(auth)
   
   let headers = {
@@ -26,7 +27,7 @@ DefaultT = unknown,
   }
   
   return $fetch<T>(url, {
-    baseURL: 'http://localhost:9000',
+    baseURL: config.public.baseURL,
     ...opts,
     headers,
     onRequest({ request, options }) {
@@ -36,14 +37,20 @@ DefaultT = unknown,
       if (response.status === 401) {
         auth.resetToken()
       }
-      console.error(`response: ${response}, error: ${error}`)
+      console.error(`response: ${JSON.stringify(response)}, error: ${error}`)
     }
   })
 }
 
-export function $post<T>(
-  request: Parameters<typeof $fetch<T>>[0],
-  opts?: Parameters<typeof $fetch<T>>[1],
+export function $post<
+DefaultT = unknown,
+    DefaultR extends NitroFetchRequest = NitroFetchRequest,
+    T = DefaultT,
+    R extends NitroFetchRequest = DefaultR,
+    O extends NitroFetchOptions<R> = NitroFetchOptions<R>
+    >(
+  request: R,
+  opts?: O,
 ) {
   return $api<T>(request, { ...opts, method: 'POST' })
 }
