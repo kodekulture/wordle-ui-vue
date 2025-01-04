@@ -26,6 +26,20 @@ export const useGamesStore = defineStore('useGamesStore', {
       } finally {
         this.loading = false;
       }
+    },
+
+    async create(): Promise<string | null> {
+      try {
+        this.loading = true;
+        const { id } = await gameFactory.createRoom();
+        return id;
+      } catch(e) {
+        console.error(e);
+        this.error = "failed to create new game"
+      } finally {
+        this.loading = false;
+      }
+      return null;
     }
   },
 })

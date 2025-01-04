@@ -25,22 +25,41 @@
       </div>
     </div>
   </div>
-  <UButton class="float-right z-10 absolute bottom-3 right-3">Create New Game</UButton>
+  <UModal v-model="showModal">
+    <div class="p-2 m-2 flex flex-col items-center justify-center">
+      <UInput v-model="gid" variant="outline" placeholder="Game UUID..." size="lg" class="mb-8" />
+      <UButton @click="joinGame">Join Game</UButton>
+    </div>
+  </UModal>
+  <div class="float-right z-10 absolute bottom-3 right-3 flex flex-col">
+    <UButton @click="createGame" class="mb-4 rounded-xl justify-center">Create New Game</UButton>
+    <UButton @click="showModal = true" class="rounded-xl flex justify-center">Join Game</UButton>
+  </div>
+  
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs, useGamesStore, computed, useToast } from '#build/imports';
-// import VueMomentsAgo from "vue-moments-ago";
-
+import { storeToRefs, useGamesStore, computed, navigateTo, definePageMeta, showToastError } from '#build/imports';
 const gamesStore = useGamesStore()
-const toast = useToast()
+const showModal = ref(false)
 const { games, error, loading, last_fetched } = storeToRefs(gamesStore);
 const updated = computed(() => last_fetched.toString())
+const gid = ref('')
 await gamesStore.refresh()
 if (error.value) {
-  toast.add({ title: error.value, icon: 'i-heroicons-solid-exclamation-triangle', color: 'red' })
+  showToastError(error.value)
 }
 
+const createGame = async () => {
+  const id = await gamesStore.create()
+  await navigateTo(`/game/${id}`)
+}
+
+const joinGame = async () => await navigateTo(`/game/${gid.value}`)
+
+definePageMeta({
+  middleware: 'auth'
+})
 </script>
 
 <style></style>

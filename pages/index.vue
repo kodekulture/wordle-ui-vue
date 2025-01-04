@@ -1,17 +1,14 @@
 <template>
-    <div>
-        <UButton @click="console.log(config.public.baseURL)">Test Create Room</UButton>
-        <UButton>Test Join Room</UButton>
-        <UButton></UButton>
-    <div>
-        This is Hello world
+    <div class="p-2 flex flex-wrap">
+        <IconButton link="/game" text="Games" />
+        <!-- <IconButton link="#" text="Settings" />
+        <IconButton link="#" />
+        -->
     </div>
-</div>
 </template>
 
 <script setup>
 import { definePageMeta } from '#imports';
-const config = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth'
 })

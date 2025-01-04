@@ -16,9 +16,9 @@ export const gameFactory = {
 }
 
 export interface Game {
-    created_at: any;
-    started_at: any;
-    ended_at: any;
+    created_at: Date;
+    started_at: Date;
+    ended_at: Date | null;
     creator: string;
     /**
      * the correct_word is not null only when the game has ended
@@ -26,34 +26,39 @@ export interface Game {
     correct_word: string | null;
     /**
      * guesses is the current user's guesses
+     * [PARTIAL] - may not be displayed when list of games is fetched
      */
-    guesses: Guess[] | null;
+    guesses: WordGuess[] | null;
     /**
      * game_performance contains the best guesses of all the players
+     * [PARTIAL]
      */
-    game_performance: PlayerGuess[] | null;
+    game_performance: Leaderboard | null;
     id: string;
 }
 
-export interface Guess {
+export type Leaderboard = PlayerSummary[];
+
+export interface WordGuess {
     word: string | null;
     played_at: Date;
     status: number[];
 }
 
-export interface PlayerGuess {
-    guess_response: Guess | null;
+export interface PlayerSummary {
+    best: WordGuess;
     username: string;
-    /**
-     * [ended] game
-     * 
-     * rank is null when the game has not ended
-     */
-    rank: number | null;
+    rank: number;
+    words_played: number;
+}
+
+export interface PlayerGuessResponse {
+    result: WordGuess;
     /**
      * [active] game
      * 
      * amount of players displaced in the leaderboard +2 means this user's last move displaced 2 users.
      */
     rank_offset: number | null;
+    leaderboard: Leaderboard;
 }

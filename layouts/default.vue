@@ -19,9 +19,9 @@
     </div>
     </nav>
   </header>
-  <div class="mt-20">
-  <slot />
-</div>
+  <div class="pt-[48px] h-screen">
+    <slot />
+  </div>
 </template>
 
 <script lang="ts" setup>

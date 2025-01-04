@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
-import { ref, navigateTo, definePageMeta, useToast } from '#imports';
-import { useAuthStore } from '#imports';
+import { ref, navigateTo, definePageMeta } from '#imports';
+import { useAuthStore, showToastError } from '#imports';
 const obj = ref({
     username: '', password: ''
 })
 const store = useAuthStore();
-const toast = useToast()
 const { loading, isLoggedIn, error } = storeToRefs(store);
 async function register() {
     const v = obj.value
@@ -15,7 +14,7 @@ async function register() {
         navigateTo('/')
     }
     if (error.value) {
-        toast.add({title: error.value, icon:'i-heroicons-solid-exclamation-triangle', color:'red'})
+        showToastError(error.value)
     }
 }
 const toLogin = () => navigateTo('/login')

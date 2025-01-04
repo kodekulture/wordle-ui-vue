@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       baseURL: 'http://localhost:9000'
     }
   },
-  css: ['~/assets/main.css'],
+  css: ['~/assets/main.scss'],
   alias: {
     "@": resolve(__dirname, '/'),
   },

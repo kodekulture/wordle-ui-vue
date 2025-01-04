@@ -33,6 +33,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
 
   const resetToken = () => {
     token.value = null;
+    // location.reload()
   }
 
   const reset = () => {

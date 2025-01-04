@@ -1,6 +1,7 @@
 import { useAuthStore } from "~/stores/authStore"
 import {storeToRefs} from 'pinia'
 import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
+import { useRuntimeConfig } from "#app"
 
 export function $api<
 DefaultT = unknown,
