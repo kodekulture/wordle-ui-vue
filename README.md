@@ -1,75 +1,28 @@
-# Nuxt Minimal Starter
+# Wordle UI
+## Showcase 
+![screenshot](./bin/screenshot.png)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Features
+- [x] Basic authentication
+- [x] Real-time chat (messages get wiped during reconnection)
+- [x] Game reconnection
+- [x] Word hints (green, amber and grey colors)
+- [ ] Leaderboard
+- [ ] Messages describing other player's actions (left the room, joined the room, etc)
+- [ ] Smooth UI/UX 
 
 ## Setup
 
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+1. Start the wordle server.
+2. Set the URL value in nuxt.config.ts
+```js
+ runtimeConfig: {
+    public: {
+      baseURL: 'http://localhost:9000'
+    }
+  }
 ```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+3. Run server in dev mode 
+```bash 
+yarn && yarn run dev
 ```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
