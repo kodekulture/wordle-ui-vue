@@ -27,23 +27,36 @@ jobs:
       run: yarn install
     - name: Generate Static Files
       run: yarn run generate
-    - name: Setup SSH Authentication
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        echo "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+    
+    # - name: Setup SSH Authentication
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+    #     chmod 600 ~/.ssh/id_rsa
+    #     echo "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
     - name: Transfer static files to Server
-      run: |
-        echo "Transferring static files to server..."
-        scp -r .output/public ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:${{env.DEPLOY_PATH}}.new
-        echo "Done 🚀"
+      uses: appleboy/scp-action@v0.1.7
+      with: 
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: .output/public/*
+        target: ${{ env.DEPLOY_PATH }}.new
+      # run: |
+      #   echo "Transferring static files to server..."
+      #   scp -r .output/public ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:${{env.DEPLOY_PATH}}.new
+      #   echo "Done 🚀"
     - name: Deploy on Server
-      env: 
-        DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
-      run: |
-        echo "Deploying static files on server..."
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        envs: DEPLOY_PATH
+        script: |
+          whoami
+
+          echo "Deploying static files in server"
           if [ -d "$DEPLOY_PATH" ]; then
             echo "Creating backup of current static files"
             mv $DEPLOY_PATH ${DEPLOY_PATH}_backup
@@ -51,10 +64,24 @@ jobs:
 
           echo "Moving new static files to deployment directory"
           mv ${DEPLOY_PATH}.new $DEPLOY_PATH
-
           echo "Static files deployed successfully"
-          ls -al
-        EOF
-    - name: Cleanup SSH Authentication
-      run: |
-        rm -rf ~/.ssh
+          ls -al 
+      # env: 
+      #   DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
+      # run: |
+      #   echo "Deploying static files on server..."
+      #   ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+      #     if [ -d "$DEPLOY_PATH" ]; then
+      #       echo "Creating backup of current static files"
+      #       mv $DEPLOY_PATH ${DEPLOY_PATH}_backup
+      #     fi
+
+      #     echo "Moving new static files to deployment directory"
+      #     mv ${DEPLOY_PATH}.new $DEPLOY_PATH
+
+      #     echo "Static files deployed successfully"
+      #     ls -al
+      #   EOF
+    # - name: Cleanup SSH Authentication
+    #   run: |
+    #     rm -rf ~/.ssh
