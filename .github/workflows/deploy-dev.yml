@@ -46,9 +46,13 @@ jobs:
           whoami
 
           echo "Deploying static files in server"
+          BKP="${DEPLOY_PATH}_backup"
+          if [ -d "$BKP" ]; then
+            rm -rf "$BKP"
+          fi
           if [ -d "$DEPLOY_PATH" ]; then
             echo "Creating backup of current static files"
-            mv $DEPLOY_PATH ${DEPLOY_PATH}_backup
+            mv $DEPLOY_PATH $BKP
           fi
 
           echo "Moving new static files to deployment directory"
