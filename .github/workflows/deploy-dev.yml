@@ -33,7 +33,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
-        source: .output/public/*
+        source: .output/public/
         target: ${{ env.DEPLOY_PATH }}.new
     - name: Deploy on Server
       uses: appleboy/ssh-action@v1.2.0
@@ -47,9 +47,7 @@ jobs:
 
           echo "Deploying static files in server"
           BKP="${DEPLOY_PATH}_backup"
-          if [ -d "$BKP" ]; then
-            rm -rf "$BKP"
-          fi
+          rm -rf "$BKP"
           if [ -d "$DEPLOY_PATH" ]; then
             echo "Creating backup of current static files"
             mv $DEPLOY_PATH $BKP
