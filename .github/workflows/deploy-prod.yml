@@ -1,0 +1,67 @@
+name: deploy-wordle-ui-prod
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main #TODO: remove after testing
+
+env:
+  DEPLOY_PATH: ${{secrets.DEPLOY_ROOT}}/servers/wordle-ui
+  APP_NAME: wordle-ui
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install SSH Client
+      run: sudo apt-get install -y sshpass
+    - name: Use Node.js 23.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 23.x
+        cache: 'yarn'
+    - name: Install Dependencies
+      run: yarn install
+    - name: Generate Static Files
+      run: yarn build
+    - name: Transfer static files to Server
+      uses: appleboy/scp-action@v0.1.7
+      with: 
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: .output/*
+        target: ${{ env.DEPLOY_PATH }}.new
+    - name: Deploy on Server
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        envs: DEPLOY_PATH,APP_NAME
+        script: |
+          whoami
+          echo "Deploying SSR wordle-ui server"
+          
+          BKP="${DEPLOY_PATH}_backup"
+          rm -rf "$BKP"
+          if [ -d "$DEPLOY_PATH" ]; then
+            echo "Creating backup of current server files"
+            mv $DEPLOY_PATH $BKP
+          fi
+
+          echo "Moving new server files to deployment directory"
+          mv ${DEPLOY_PATH}.new/.output $DEPLOY_PATH
+          rm -rf ${DEPLOY_PATH}.new
+          
+          # Restart PM2
+          echo "Restarting server process with PM2..."
+          pm2 reload ${APP_NAME} || pm2 start $DEPLOY_PATH/server/index.mjs --name ${APP_NAME}
+          echo "Static files deployed successfully"
+          pm2 status ${APP_NAME}
