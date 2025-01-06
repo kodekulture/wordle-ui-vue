@@ -1,4 +1,6 @@
 # Wordle UI
+[![deploy-wordle-ui-dev](https://github.com/kodekulture/wordle-ui-vue/actions/workflows/deploy-dev.yml/badge.svg)](https://github.com/kodekulture/wordle-ui-vue/actions/workflows/deploy-dev.yml)
+[![deploy-wordle-ui-prod](https://github.com/kodekulture/wordle-ui-vue/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/kodekulture/wordle-ui-vue/actions/workflows/deploy-prod.yml)
 ## Showcase 
 ![screenshot](./bin/screenshot.png)
 

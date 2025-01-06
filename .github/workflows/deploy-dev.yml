@@ -1,0 +1,59 @@
+name: deploy-wordle-ui-dev
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+env:
+  DEPLOY_PATH: ${{secrets.DEPLOY_ROOT}}/static/wordle-ui
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install SSH Client
+      run: sudo apt-get install -y sshpass
+    - name: Use Node.js 23.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 23.x
+        cache: 'yarn'
+    - name: Install Dependencies
+      run: yarn install
+    - name: Generate Static Files
+      run: yarn run generate
+    - name: Transfer static files to Server
+      uses: appleboy/scp-action@v0.1.7
+      with: 
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: .output/public/*
+        target: ${{ env.DEPLOY_PATH }}.new
+    - name: Deploy on Server
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        envs: DEPLOY_PATH
+        script: |
+          whoami
+
+          echo "Deploying static files in server"
+          BKP="${DEPLOY_PATH}_backup"
+          rm -rf "$BKP"
+          if [ -d "$DEPLOY_PATH" ]; then
+            echo "Creating backup of current static files"
+            mv $DEPLOY_PATH $BKP
+          fi
+
+          echo "Moving new static files to deployment directory"
+          mv ${DEPLOY_PATH}.new/.output/public $DEPLOY_PATH
+          rm -rf ${DEPLOY_PATH}.new
+          echo "Static files deployed successfully"
