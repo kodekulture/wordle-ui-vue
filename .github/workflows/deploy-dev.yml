@@ -33,7 +33,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
-        source: .output/public/
+        source: ./output/public/*
         target: ${{ env.DEPLOY_PATH }}.new
     - name: Deploy on Server
       uses: appleboy/ssh-action@v1.2.0
@@ -54,5 +54,6 @@ jobs:
           fi
 
           echo "Moving new static files to deployment directory"
-          mv ${DEPLOY_PATH}.new $DEPLOY_PATH
+          mv ${DEPLOY_PATH}.new/.output/public $DEPLOY_PATH
+          rm -rf ${DEPLOY_PATH}.new
           echo "Static files deployed successfully"
