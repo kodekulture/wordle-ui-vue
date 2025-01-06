@@ -5,7 +5,10 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+    
+env:
+  DEPLOY_PATH: ${{secrets.DEPLOY_ROOT}}/static/wordle-ui
+  
 jobs:
   build:
 
@@ -13,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Install SSH Client
+      run: sudo apt-get install -y sshpass
     - name: Use Node.js 23.x
       uses: actions/setup-node@v4
       with:
@@ -22,30 +27,34 @@ jobs:
       run: yarn install
     - name: Generate Static Files
       run: yarn run generate
-    - name: ssh into server
-      uses: appleboy/ssh-action@v1.2.0
-      env:
-        ROOT: ${{ secrets.DEPLOY_ROOT }} 
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        envs: ROOT
-        script: |
-          whoami
-    
-          PROJECT_NAME="wordle-ui"
-          DEPLOY_PATH="${ROOT}/static/${PROJECT_NAME}"
-
-          # check and migrate old files and store as backup
+    - name: Setup SSH Authentication
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        echo "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+    - name: Transfer static files to Server
+      run: |
+        echo "Transferring static files to server..."
+        scp -r .output/public ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:${{env.DEPLOY_PATH}}.new
+        echo "Done 🚀"
+    - name: Deploy on Server
+      env: 
+        DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
+      run: |
+        echo "Deploying static files on server..."
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           if [ -d "$DEPLOY_PATH" ]; then
-            echo "Backup the existing static directory"
+            echo "Creating backup of current static files"
             mv $DEPLOY_PATH ${DEPLOY_PATH}_backup
           fi
 
-          # Ensure the deployment directory exists
-          mkdir -p $DEPLOY_PATH
+          echo "Moving new static files to deployment directory"
+          mv ${DEPLOY_PATH}.new $DEPLOY_PATH
 
-          rsync -avz .output/public/ $DEPLOY_PATH/
-
-          echo "CSR static files deployed to $DEPLOY_PATH"
+          echo "Static files deployed successfully"
+          ls -al
+        EOF
+    - name: Cleanup SSH Authentication
+      run: |
+        rm -rf ~/.ssh
