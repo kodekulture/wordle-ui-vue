@@ -1,0 +1,50 @@
+name: deploy-wordle-ui-dev
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 23.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 23.x
+        cache: 'yarn'
+    - name: Install Dependencies
+      run: yarn install
+    - name: Generate Static Files
+      run: yarn run generate
+    - name: ssh into server
+      uses: appleboy/ssh-action@v1.2.0
+      env:
+        ROOT: ${{ secrets.DEPLOY_ROOT }} 
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          whoami
+    
+          PROJECT_NAME="wordle-ui"
+          DEPLOY_PATH="${ROOT}/static/${PROJECT_NAME}"
+
+          # check and migrate old files and store as backup
+          if [ -d "$DEPLOY_PATH" ]; then
+            echo "Backup the existing static directory"
+            mv $DEPLOY_PATH ${DEPLOY_PATH}_backup
+          fi
+
+          # Ensure the deployment directory exists
+          mkdir -p $DEPLOY_PATH
+
+          rsync -avz .output/public/ $DEPLOY_PATH/
+
+          echo "CSR static files deployed to $DEPLOY_PATH"
