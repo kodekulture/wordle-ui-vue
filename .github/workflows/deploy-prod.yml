@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - main #TODO: remove after testing
 
 env:
   DEPLOY_PATH: ${{secrets.DEPLOY_ROOT}}/servers/wordle-ui
