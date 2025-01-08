@@ -28,7 +28,7 @@ $gray: #676767;
   --back-color: $gray;
   background-color: var(--front-color);
   border-color: $gray;
-  @apply border border-solid size-20 flex justify-center items-center text-4xl font-[bolder];
+  @apply border border-solid size-16 flex justify-center items-center text-4xl font-[bolder];
 }
 
 li:not([data-letter=" "]) {

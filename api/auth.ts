@@ -1,13 +1,11 @@
-import {$api, $post} from '../composables/api';
-
 export const authFactory = {
     login<T>(username: string, password: string) {
-        return $post<T>('/login', {body:{ username, password } })
+        return $api<T>('/login', {body:{ username, password }, method: 'POST' })
     },
     register<T>(username: string, password: string) {
-        return $post<T>('/register', {body: {username, password}})
+        return $api<T>('/register', {body: {username, password}, method: 'POST'})
     },
-    me<T>() {
-        return $api<T>('/me')
+    logout<T>() {
+        return $api<T>('/logout', {method: 'POST'})
     }
 }

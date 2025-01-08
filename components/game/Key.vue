@@ -1,6 +1,6 @@
 <template>
   <div :style="{backgroundColor: color}"
-       class='p-6 m-1 max-w-12 max-h-12 border-gray-500 border rounded-md flex justify-center items-center cursor-pointer'>
+       class='p-2 m-0.5 lg:m-1 max-h-9 border-gray-500 border rounded-md flex shrink justify-center items-center cursor-pointer'>
     {{ letter }}
   </div>
 </template>

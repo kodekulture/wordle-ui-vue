@@ -1,45 +1,43 @@
 import { defineStore } from 'pinia'
-import { gameFactory, type Game } from '~/api/game';
+import { type Game } from '~/api/game';
+import {useFetchApi} from "~/composables/use-fetch-api";
+import type {AsyncDataExecuteOptions} from "#app/composables/asyncData";
 
-export const useGamesStore = defineStore('useGamesStore', {
-  state: () => ({
-    loading: false,
-    games: [] as Game[],
-    last_fetched: Date,
-    error: null as string | null,
-  }),
-  actions: {
-    async refresh() {
-      try {
-        this.loading = true;
-        this.error = '';
+export const useGamesStore = defineStore('useGamesStore',  () => {
+  const {data, error, refresh: _refresh, status } = useFetchApi<Game[]>('/room')
+  const games = computed<Game[]>(() => data.value ?? [])
+  const last_fetched = ref<Date | null>(null);
 
-        const result = await gameFactory.rooms();
-        if (!!result) {
-          this.games = result
-          this.error = ''
-          this.last_fetched = new Date();
-        }
-      } catch (e) {
-        console.error(e);
-        this.error = "failed to get user's rooms";
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async create(): Promise<string | null> {
-      try {
-        this.loading = true;
-        const { id } = await gameFactory.createRoom();
-        return id;
-      } catch(e) {
-        console.error(e);
-        this.error = "failed to create new game"
-      } finally {
-        this.loading = false;
-      }
-      return null;
+  async function refresh(opts?: AsyncDataExecuteOptions) {
+    await _refresh(opts)
+    if (!error.value) {
+      last_fetched.value = new Date();
     }
-  },
+  }
+
+  return {
+    status,
+    games,
+    last_fetched,
+    error,
+    refresh,
+  }
+})
+
+export const useCreateGameStore = defineStore('createGameStore', () => {
+  const { data, status, error, refresh } = useFetchApiLazy<{id: string}>('/room', {
+    method: 'POST',
+    immediate: false,
+    cache: false,
+  })
+  const id = computed<string | null>(() => data.value?.id)
+  watch(data, () => {
+    console.log(`Data from createGame ${JSON.stringify(data.value)} ${Date.now()}`)
+  })
+  return {
+    id,
+    error,
+    status,
+    refresh,
+  }
 })
