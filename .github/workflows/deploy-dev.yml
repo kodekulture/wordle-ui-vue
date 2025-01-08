@@ -23,6 +23,8 @@ jobs:
         touch .env
         echo NUXT_PUBLIC_BASE_URL=${{ secrets.SERVER_URL }} >> .env
         cat .env
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
     - name: Use Node.js 23.x
       uses: actions/setup-node@v4
       with:
