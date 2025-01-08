@@ -30,11 +30,15 @@ export const useGameStore = defineStore('useGameStore', () => {
         },
         get: () => _word.value ?? '',
     })
-    const myGuesses = shallowRef<WordGuess[]>([]);
+    const myGuesses = ref<WordGuess[]>([]);
     const leaderboard = ref<Leaderboard>([]);
 
 
-    const {status, data, open, send} = useWebSocket(socketURL, {immediate: false})
+    const {status, data, open, send} = useWebSocket(socketURL,
+        {immediate: false })
+    watch(status, () => {
+        console.log(`The current status is ${status.value}`);
+    })
 
     const loading = computed(() => _loading.value || status.value === 'CONNECTING')
 
@@ -118,13 +122,23 @@ export const useGameStore = defineStore('useGameStore', () => {
     }
 
     const play = () => {
+        if (status.value !== 'OPEN') {
+            return false
+        }
         return send(JSON.stringify({event: 'server/play', data: currentWord.value}), false)
+    }
+
+    const reconnect = () => {
+        console.log(gameId.value)
+        close()
+        join(gameId.value)
     }
 
     return {
         error,
         messages,
         currentWord,
+        status, // for loading state, use `loading`, for connection status, use `status`
         loading,
         leaderboard,
         active,
@@ -135,6 +149,7 @@ export const useGameStore = defineStore('useGameStore', () => {
         start,
         message,
         play,
+        reconnect,
     }
 })
 
