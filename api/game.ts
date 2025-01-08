@@ -1,8 +1,8 @@
-import { $api, $post } from "#build/imports";
+import { $api } from "~/composables/use-fetch-api";
 
 export const gameFactory = {
     createRoom() {
-        return $post<{ id: string }>('/room')
+        return $api<{ id: string }>('/room', {method: 'POST'})
     },
     joinRoom(id: string) {
         return $api<{ token: string }>(`/join/room/${id}`)

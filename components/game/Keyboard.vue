@@ -1,15 +1,19 @@
 <template>
-<div class="flex flex-col items-center">
+<div class="flex flex-col items-center w-full overflow-auto grow-0 shrink">
   <div v-for="row in rows" class="row">
-    <game-key v-for="l in row" :letter="l" :status="colors[l]"
-              @click="update(l)" />
+    <game-key
+        class="flex-shrink-0 flex-grow"
+        v-for="l in row" :letter="l"
+        :status="colors[l]"
+        :class="{width: l === 'ENTER' ? '2rem' : '1rem' }"
+        @click="update(l)" />
   </div>
 </div>
 </template>
 
 <script setup lang="ts">
 const store = useGameStore()
-const { myGuesses, active, currentWord } = storeToRefs(store)
+const { myGuesses, active, currentWord, playError } = storeToRefs(store)
 const colors = computed(() => {
   const obj: Record<string, number> = {}
   myGuesses.value.forEach(guess => {
@@ -23,18 +27,25 @@ const colors = computed(() => {
   return obj
 })
 
+function showError(msg: string) {
+  showToastError(msg)
+  playError.value = msg
+}
+
 function play() {
-  if (!active.value) {
-    showToastError('game has not started yet')
-    return;
-  }
   if ((currentWord.value?.length ?? 0) < WORD_LENGTH) {
-    showToastError('enter five letter word')
+    showError('enter five letter word')
     return;
   }
-  store.play()
+  if (!store.play()) {
+    showError('word was not sent, reload the webpage and try again')
+  }
 }
 function update(letter: string) {
+  if (!active.value) {
+    showError('game has not started yet')
+    return;
+  }
   if (letter === 'ENTER') {
     play()
   } else if (letter === '⌫') {
@@ -52,6 +63,6 @@ const rows = [
 
 <style scoped>
 .row {
-  @apply flex justify-center;
+  @apply flex justify-center flex-nowrap w-full shrink;
 }
 </style>

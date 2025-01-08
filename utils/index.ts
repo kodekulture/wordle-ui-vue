@@ -1,5 +1,3 @@
-import { useToast } from "#build/imports";
-
 export const WORD_LENGTH: number = 5;
 export const MAX_GUESSES: number = 6;
 
@@ -12,7 +10,47 @@ export function showToastError(text: string) {
     })
 }
 
+export function pluralize(text: string, count: number = 0): string {
+    if (count === 1) {
+        return text
+    }
+    if (text.endsWith('s')) {
+        return `${text}es`
+    }
+    return `${text}s`
+}
+
 export function trimScheme(str: string): string {
-    const schemes = ['https://', 'http://']
     return str.replace(/https?:\/\//gi, '').trim()
+}
+
+/**
+ * emit is a ref<T> that set's value and resets to null after timeout
+ * @param initial value
+ * @param opts options
+ */
+export function emit<T>(initial: T | null, opts?: EmitOpts) {
+    const _data = ref<T | null>(initial);
+    const tm = {
+        ...defaultOpts,
+        ...opts,
+    }
+    return computed({
+        set: (val: T | null) => {
+            _data.value = val;
+            setTimeout(() => {
+                _data.value = null
+            }, tm.resetAfter)
+        },
+        get: (): T | null => _data.value
+    })
+
+}
+
+const defaultOpts: EmitOpts = {
+    resetAfter: 200,
+}
+
+export interface EmitOpts {
+    resetAfter: number;
 }

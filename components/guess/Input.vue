@@ -1,18 +1,34 @@
 <template>
   <guess-view v-if="true" :class="{shake: failedValidation}" :guess="guess" />
   <input type="text"
+         ref="input"
          autofocus
          v-model="currentWord"
          @keydown.enter="play"
          @keydown="isLetter($event)"
+         :disabled="disabled"
          :maxlength="WORD_LENGTH"
-  @blur="({target}) => (target as HTMLInputElement).focus()" />
+  />
 </template>
 
 <script setup lang="ts">
+defineProps<{disabled: boolean}>()
+defineExpose({ focusInput })
+
 const store = useGameStore()
 const { currentWord, playError, active } = storeToRefs(store);
 const guess = computed<WordGuess>(() => ({word: currentWord.value}))
+const input = ref<HTMLInputElement | null>(null)
+
+function focusInput() {
+  if (!input.value) {
+    return
+  }
+  if (input.value && document.activeElement !== input.value) {
+    input.value?.focus()
+  }
+}
+
 function play() {
   if (!active.value) {
     showToastError('game has not started yet')
@@ -22,7 +38,9 @@ function play() {
     showToastError('enter five letter word')
     return;
   }
-  store.play()
+  if (!store.play()) {
+    showToastError('word was not sent, reload the webpage and try again')
+  }
 }
 
 const failedValidation = computed(() => playError.value != null)

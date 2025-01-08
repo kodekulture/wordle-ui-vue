@@ -1,9 +1,17 @@
 import { defineStore } from 'pinia'
 import {authFactory} from '~/api/auth';
-import {computed, ref, useLocalStorage } from '#imports'
+import {useLocalStorage} from "@vueuse/core";
 
 export const useAuthStore = defineStore('useAuthStore', () => {
-  const token = useLocalStorage<string | null>('x-token', null);
+
+  // errors
+  const error = emit<string>(null)
+
+  // lazyAPIs
+  const { data, error: meError, status, refresh} = useFetchApiLazy<User>('/me')
+  const loading = computed(() => status.value === 'pending')
+
+  // local storage
   const _user = useLocalStorage<string | null>('x-user', null);
   const user = computed<User | null>({
     get: () => 
@@ -13,66 +21,59 @@ export const useAuthStore = defineStore('useAuthStore', () => {
       _user.value = value ? JSON.stringify(value) : value
     },
   })
-  const loading = ref(false);
-  const error = ref<string | null>(null);
-  const isLoggedIn = computed(() => !!token.value && !!user.value)
-  const bearer = computed(() => token.value ? `Bearer ${token.value}` : null)
 
+  watch(data, () => {
+    user.value = data.value
+  })
 
+  // functions
   const checkAuth = async () => {
-    try {
-      const res = await authFactory.me<User>();
-      if (res.username) {
-        user.value = {username: res.username}
-      }
-    }catch(e) {
-      error.value = 'error checking authenticated user';
-      console.log('error fetching current user');
+    await refresh({dedupe: 'defer'})
+    if (data.value) {
+      user.value = data.value 
+    } else if (meError.value) {
+      error.value = `error checking authenticated user ${meError.value}`
     }
   }
 
-  const resetToken = () => {
-    token.value = null;
-    // location.reload()
-  }
-
-  const reset = () => {
-    resetToken()
-    user.value = null;
-  }
-
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<boolean> =>  {
     try {
-      const res: {access_token: string} = await authFactory.login(username, password);
-      token.value = res.access_token;
+      await authFactory.login(username, password);
       await checkAuth()
+      return !!user.value
     }catch(e) {
-      error.value = 'error logging in';
-      console.log('error logging in', e);
+      error.value = `error logging in\n${e}`;
     }
   }
 
-  const register = async(username: string, password: string) => {
+  const register = async (username: string, password: string): Promise<boolean> => {
     try {
-      const res: {access_token: string} = await authFactory.register(username, password);
-      token.value = res.access_token;
+      await authFactory.register(username, password);
+      return true
     } catch(e) {
       error.value = 'error registering user';
       console.log(`error signing up ${e}`)
     }
+    return false
+  }
+
+  const logout = async () => {
+    try {
+      await authFactory.logout()
+    } catch(e) {
+      error.value = `error logging out
+${e}`;
+    }
   }
 
   return {
-    bearer,
     user,
-    isLoggedIn,
     loading,
     error,
     checkAuth,
     login,
     register,
-    resetToken,
-    reset,
+    logout,
   }
 })
 

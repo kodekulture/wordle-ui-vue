@@ -5,15 +5,15 @@ import {resolve} from 'path';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: {
-    enabled: false,
+    enabled: true,
     timeline: {
-      enabled: false,
+      enabled: true,
     },
   },
   runtimeConfig: {
     public: {
       baseURL: 'http://localhost:9000'
-    }
+    },
   },
   css: ['~/assets/main.scss'],
   alias: {
