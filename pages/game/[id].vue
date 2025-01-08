@@ -27,70 +27,66 @@
           class="hidden lg:flex lg:w-1/3 bg-black-500 justify-center items-center min-h-0 overflow-auto"
       />
     </div>
-    <UModal v-model="showLoading" prevent-close>
-      <div class="p-4 flex flex-col items-center justify-center">
-        <span class="mb-4">Loading...</span>
-        <UProgress animation="carousel" />
-      </div>
-    </UModal>
-    <UModal v-model="showError" prevent-close>
-        <div class="p-4 flex flex-col justify-center">
-          <span class="text-wrap mb-4">{{shownError}}</span>
-          <UButton @click="navigateTo('/game')" class="justify-center">Exit</UButton>
-        </div>
-    </UModal>
-    <UModal v-model="showStart" prevent-close>
-      <div :hidden="!notActive">
-        <div class="p-4 w-full h-full z-10">
-          <div v-if="owner" class="flex flex-col items-center justify-center h-full">
-            <span class="mb-4">Players are waiting for you to start the game...</span>
-            <UButton @click="store.start">Start</UButton>
-          </div>
-          <div v-else-if="owner != null && !owner">
-            <span class="mb-4">Waiting for owner to start game...</span>
-            <UProgress animation="carousel" />
-          </div>
-        </div>
-      </div>
-    </UModal>
     <!-- Mobile Layout -->
-    <div class="block h-full md:hidden min-h-0">
-      <!-- Game Board -->
-      <game-board
-          :game="game"
-          class="h-full flex justify-between items-center min-h-0 overflow-auto"
-      />
-
-      <!-- Floating Buttons -->
-      <div class="absolute top-4 right-4 flex flex-col gap-2 z-50">
-        <UButton @click="activeOverlay = 'chat'" label="Chats"/>
-        <UButton @click="activeOverlay = 'leaderboard'" label="LeaderBoard"/>
+    <div class="flex flex-col h-full w-full md:hidden min-h-0">
+      <!-- Navbar -->
+      <div class="relative flex w-full h-8 justify-around items-center bg-gray-800 text-white">
+        <!-- Animated indicator -->
+        <div class="absolute left-0 w-1/3 h-full rounded-lg bg-primary transition-transform duration-300"
+        :style="{ transform: `translateX(${activeIndex*100}%)`}"/>
+        <button v-for="(tab, index) in tabs" :key="index"
+                class="relative flex flex-1 items-center justify-center z-10 px-4 py-2"
+            @click="switchTab(index)"
+        >
+          {{tab.text}}
+        </button>
       </div>
 
-      <!-- Overlay -->
-      <USlideover v-model="overlayPresent">
-        <UButton
-            color="gray"
-            variant="ghost"
-            size="sm"
-            icon="i-heroicons-x-mark-20-solid"
-            class="flex sm:hidden absolute end-5 top-5 z-10"
-            square
-            padded
-            @click="activeOverlay = null"
-        />
-        <div v-if="activeOverlay == 'chat'" class="min-h-0 overflow-auto">
-          <game-chat/>
+      <!-- Page Content -->
+      <div class="min-h-0 flex-1 grow overflow-auto">
+        <transition name="fade" mode="out-in">
+        <div v-if="activePage === 'chat'" class="h-full min-h-0 overflow-auto" key="chat">
+          <div v-if="ended">
+            Game has Ended
+          </div>
+          <game-chat v-else />
         </div>
-        <div
-            v-if="activeOverlay == 'leaderboard'"
-            class="min-h-0 overflow-auto"
-        >
+        <div v-else-if="activePage === 'game'" class="h-full min-h-0 overflow-auto" key="game">
+          <game-board :game="game"/>
+        </div>
+        <div v-else-if="activePage === 'leaderboard'" class="h-full min-h-0 overflow-auto" key="leaderboard">
           <game-leader-board/>
         </div>
-      </USlideover>
+        </transition>
+      </div>
     </div>
   </div>
+  <UModal v-model="showLoading" prevent-close>
+    <div class="p-4 flex flex-col items-center justify-center">
+      <span class="mb-4">Loading...</span>
+      <UProgress animation="carousel"/>
+    </div>
+  </UModal>
+  <UModal v-model="showError" prevent-close>
+    <div class="p-4 flex flex-col justify-center">
+      <span class="text-wrap mb-4">{{ shownError }}</span>
+      <UButton @click="navigateTo('/game')" class="justify-center">Exit</UButton>
+    </div>
+  </UModal>
+  <UModal v-model="showStart" prevent-close>
+    <div :hidden="!notActive">
+      <div class="p-4 w-full h-full z-50">
+        <div v-if="owner" class="flex flex-col items-center justify-center h-full">
+          <span class="mb-4">Players are waiting for you to start the game...</span>
+          <UButton @click="store.start">Start</UButton>
+        </div>
+        <div v-else-if="owner != null && !owner">
+          <span class="mb-4">Waiting for owner to start game...</span>
+          <UProgress animation="carousel"/>
+        </div>
+      </div>
+    </div>
+  </UModal>
 </template>
 
 
@@ -112,7 +108,7 @@ if (!finished) {
   store.join(id)
 }
 
-const {loading, error, active, owner} = storeToRefs(store)
+const {loading, status, error, active, owner} = storeToRefs(store)
 const notActive = computed(() => !loading.value && !active.value)
 const ended = computed<boolean>(() => game.value?.ended_at != null)
 const showLoading = computed(() => ended.value ? false : loading.value)
@@ -122,7 +118,10 @@ const shownError = computed<string | null>(() => {
 })
 
 const showError = computed<boolean>(() => shownError.value != null)
-const showStart = computed<boolean>(() => !active.value && !showError.value && !showLoading.value)
+const showStart = computed<boolean>(() => !active.value &&
+    !showError.value &&
+    !showLoading.value &&
+status.value === 'OPEN')
 
 watch(error, () => {
   if (error.value == null) return;
@@ -134,6 +133,23 @@ definePageMeta({
 })
 
 // Display LOGIC
-const activeOverlay = ref<null | 'chat' | 'leaderboard'>(null)
-const overlayPresent = computed(() => activeOverlay.value != null)
+const activePage = ref<'chat' | 'game' | 'leaderboard'>('game');
+const activeIndex = ref(1);
+const tabs = [{key: 'chat', text: 'Chat'}, {key: 'game', text: 'Game'}, {key: 'leaderboard', text: 'Leaderboard'}]
+const switchTab = (index: number) => {
+  activePage.value = tabs[index].key;
+  activeIndex.value = index;
+};
 </script>
+
+<style lang="scss">
+/* Page Transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

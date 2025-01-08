@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col justify-between h-full w-full py-12 items-center">
+  <div class="flex flex-col justify-around md:justify-between h-full w-full md:py-12 items-center">
     <div @mouseover="focusInput">
       <ul>
-        <li v-for="guess in guesses">
+        <li v-for="(guess, index) in guesses" :key="`${guess.word}-${guess.status}-${index}`">
         <guess-view :guess="guess" />
         </li>
         <li v-if="showInput">
