@@ -20,8 +20,8 @@ export function pluralize(text: string, count: number = 0): string {
     return `${text}s`
 }
 
-export function trimScheme(str: string): string {
-    return str.replace(/https?:\/\//gi, '').trim()
+export function convertToWebSocketURL(url: string): string {
+    return url.replace(/^(http)(s)?:\/\//i, (_, http, https) => https ? 'wss://' : 'ws://');
 }
 
 /**

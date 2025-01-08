@@ -1,6 +1,6 @@
 import {useRuntimeConfig} from '#app';
 import {defineStore, storeToRefs} from 'pinia';
-import {trimScheme, WORD_LENGTH} from '~/utils'
+import {convertToWebSocketURL, WORD_LENGTH} from '~/utils'
 import type {Leaderboard, PlayerGuessResponse, WordGuess} from '~/api/game';
 import {type Game, gameFactory} from '~/api/game';
 import {useWebSocket} from "@vueuse/core";
@@ -15,7 +15,7 @@ export const useGameStore = defineStore('useGameStore', () => {
     const gameOwner = ref<string | null>(null);
     const config = useRuntimeConfig();
 
-    const socketURL = computed(() => `ws://${trimScheme(config.public.baseURL)}/live?token=${joinToken.value}`)
+    const socketURL = computed(() => `${convertToWebSocketURL(config.public.baseURL)}/live?token=${joinToken.value}`)
     const {user} = storeToRefs(useAuthStore())
     const owner = computed(() => gameOwner.value == null || user.value?.username == null ? null : gameOwner.value === user.value?.username)
 
