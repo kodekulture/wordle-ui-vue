@@ -1,9 +1,15 @@
 import {NitroFetchOptions, NitroFetchRequest} from "nitropack";
+import {useFetch, type UseFetchOptions} from "#app";
 
 export function useFetchApi<T>(url: MaybeRefOrGetter<string>,
                                options?: UseFetchOptions<T>) {
+
     return useFetch<T>(url, {
         ...options,
+            headers: {
+                ...useRequestHeaders(['cookie']),
+                ...options?.headers,
+            },
         $fetch: useNuxtApp().$api as typeof $fetch,
     })
 }
@@ -12,6 +18,10 @@ export function useFetchApiLazy<T>(url: MaybeRefOrGetter<string>,
                                 options?: UseFetchOptions<T>) {
     return useLazyFetch<T>(url, {
         ...options,
+    headers: {
+    ...useRequestHeaders(['cookie']),
+    ...options?.headers,
+    },
         $fetch: useNuxtApp().$api as typeof $fetch,
     })
 }
