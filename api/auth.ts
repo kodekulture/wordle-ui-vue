@@ -1,3 +1,5 @@
+import {useFetchApi} from "~/composables/use-fetch-api";
+
 export const authFactory = {
     login<T>(username: string, password: string) {
         return $api<T>('/login', {body:{ username, password }, method: 'POST' })
