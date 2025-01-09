@@ -44,5 +44,8 @@ const toLogin = () => navigateTo('/login')
 definePageMeta({
   layout: 'auth'
 })
+useHead({
+  title: 'Register'
+})
 
 </script>

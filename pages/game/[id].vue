@@ -132,6 +132,10 @@ definePageMeta({
   middleware: ['auth', 'finished-game']
 })
 
+useHead({
+  title: 'Game Room'
+})
+
 // Display LOGIC
 const activePage = ref<'chat' | 'game' | 'leaderboard'>('game');
 const activeIndex = ref(1);

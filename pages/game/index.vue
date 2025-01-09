@@ -70,6 +70,9 @@ const updated = computed(() => last_fetched?.value.toString())
 definePageMeta({
   middleware: 'auth'
 })
+useHead({
+  title: 'Games'
+})
 </script>
 
 <style></style>
