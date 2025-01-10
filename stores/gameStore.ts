@@ -17,7 +17,8 @@ export const useGameStore = defineStore('useGameStore', () => {
 
     const socketURL = computed(() => `${convertToWebSocketURL(config.public.baseURL)}/live?token=${joinToken.value}`)
     const {user} = storeToRefs(useAuthStore())
-    const owner = computed(() => gameOwner.value == null || user.value?.username == null ? null : gameOwner.value === user.value?.username)
+    const owner = computed(() => gameOwner.value == null ||
+    user.value?.username == null ? null : gameOwner.value === user.value?.username)
 
     const messages = ref<Message[]>([]);
     const _word = ref<string | null>(null);

@@ -6,30 +6,33 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     const error = emit<string>(null)
     const {data, error: meError, status, refresh, clear } = useFetchApi<User>('/me', {immediate: false})
     const loading = computed(() => status.value === 'pending')
-    // const storedUser = useLocalStorage<User | null>('x-user', null, {
-    //     serializer: {
-    //         read: (raw) => raw ? JSON.parse(raw) : null,
-    //         write: (obj) => JSON.stringify(obj),
-    //     }
-    // });
+    const storedUser = useLocalStorage<User | null>('x-user', null, {
+        serializer: {
+            read: (raw) => raw ? JSON.parse(raw) : null,
+            write: (obj) => JSON.stringify(obj),
+        }
+    });
 
-    const user = computed(() => data.value)
+    const user = computed(() => {
+        if(import.meta.client) {
+            return storedUser.value
+        }
+        return data.value
+    })
 
-    // if (import.meta.client) {
-    //     watch(data, () => {
-    //         storedUser.value = data.value
-    //     })
-    // }
+    if (import.meta.client) {
+        storedUser.value = data.value
+        watch(data, () => {
+            storedUser.value = data.value
+        }, {})
+    }
 
     // functions
     const checkAuth = async () => {
-        await refresh({dedupe: 'defer'})
+        await refresh({dedupe: 'cancel'})
         if (meError.value) {
             error.value = `error checking authenticated user ${meError.value}`
         }
-        console.log(`error?: ${error.value}`)
-        // console.log(`user?: ${JSON.stringify(storedUser.value)}}`)
-        console.log(`data?: ${JSON.stringify(data.value)}`)
     }
 
     const login = async (username: string, password: string): Promise<boolean> => {
@@ -67,7 +70,6 @@ ${e}`;
 
     return {
         user,
-        // data,
         loading,
         error,
         checkAuth,
