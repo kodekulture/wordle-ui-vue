@@ -2,6 +2,8 @@ import { useAuthStore } from "~/stores/authStore"
 import { storeToRefs } from "pinia";
 
 export default defineNuxtRouteMiddleware( async (to) => {
+    if(import.meta.server) return;
+
     const authStore = useAuthStore();
     const {user} = storeToRefs(authStore);
     if (user.value) {
@@ -11,5 +13,7 @@ export default defineNuxtRouteMiddleware( async (to) => {
     if (user.value) {
         return true
     }
-    return navigateTo('/login')
+    if (tryUseNuxtApp()) {
+        return navigateTo('/login')
+    }
 })

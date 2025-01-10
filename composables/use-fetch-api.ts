@@ -44,9 +44,5 @@ export const fetchWithCookie = async (url: string, cookieName: string) => {
  */
 export function $api<T>(request: NitroFetchRequest, opts?: NitroFetchOptions<T>) {
     const { $api } = useNuxtApp()
-    if (!$api) {
-        console.error('why is API null???')
-    }
-
     return $api(request, opts) as typeof $fetch<T>
 }
