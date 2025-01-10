@@ -50,7 +50,6 @@ export const useGameStore = defineStore('useGameStore', () => {
             gameId.value = id;
             joinToken.value = token;
             open()
-            console.log('setting token')
         } catch (e) {
             console.error(e);
             error.value = 'failed to join game'
