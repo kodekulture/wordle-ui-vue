@@ -1,11 +1,11 @@
 <template>
-  <div v-if="loading" v-for="n in 10">
+  <div v-if="loading" v-for="_ in 5">
     <div class="p-2 m-2 border border-gray-500 flex flex-row items-center">
-      <div class="p-2">
-        <USkeleton class="text-ellipsis text-xl" />
-        <USkeleton class="text-lg font-bold font-serif" />
+      <div class="p-2 flex w-full flex-col gap-2">
+        <USkeleton class="w-1/2 h-4" />
+        <USkeleton class="w-7/12 h-8" />
+        <USkeleton class="w-9/12 h-4" v-for="_ in 3" />
       </div>
-      <USkeleton class="flex flex-col" />
     </div>
   </div>
   <div v-else-if="games.length == 0" class="flex p-8 justify-center">
@@ -41,7 +41,7 @@
 import {useCreateGameStore,useGamesStore} from "~/stores/gamesStore";
 
 const gamesStore = useGamesStore()
-const { games, error, last_fetched, status: fetch_status } = storeToRefs(gamesStore);
+const { games, error, last_fetched, loading, status: fetch_status } = storeToRefs(gamesStore);
 watch(error, () => {
   if (error.value) {
     showToastError(`Failed to fetch game lists\n${error.value}`)

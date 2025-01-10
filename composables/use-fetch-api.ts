@@ -1,5 +1,5 @@
 import {NitroFetchOptions, NitroFetchRequest} from "nitropack";
-import {useFetch, type UseFetchOptions} from "#app";
+import {useFetch, useLazyFetch, type UseFetchOptions} from "#app";
 
 export function useFetchApi<T>(url: MaybeRefOrGetter<string>,
                                options?: UseFetchOptions<T>) {
