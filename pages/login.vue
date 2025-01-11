@@ -25,6 +25,9 @@ async function login() {
 definePageMeta({
     layout: 'auth',
 })
+useHead({
+  title: 'Login'
+})
 </script>
 <template>
     <CenterBox title="Login to Wordle With Friends">

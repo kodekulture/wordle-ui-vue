@@ -10,8 +10,8 @@
         v-for="summary in leaderboard" :key="`${summary.username}`">
       <div>
         <span class="rank">#{{ summary.rank + 1 }}</span>
-        <span class="mx-2"> {{ summary.username }}</span>
-        <span class="text-sm overflow-ellipsis font-mono text-gray-500 tracking-tight">{{ summary.words_played }} {{ pluralize('guess', summary.words_played) }}</span>
+        <span class="mx-2 text-white"> {{ summary.username }}</span>
+        <span class="text-sm font-mono text-gray-400 tracking-tight">{{ summary.words_played }} {{ pluralize('guess', summary.words_played) }}</span>
       </div>
       <div class="flex flex-nowrap ml-auto mr-0">
       <div v-for="st in status(summary.best.status)"

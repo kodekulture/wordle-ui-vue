@@ -10,9 +10,9 @@
 
       <UDivider orientation="vertical"/>
       <!-- Medium Screen Layout: Chat and Leaderboard Stacked Vertical -->
-      <div class="hidden md:flex md:flex-col md:w-1/2 lg:w-1/3 min-h-0">
+      <div class="hidden md:flex md:flex-col md:w-1/2 lg:w-1/4 min-h-0">
         <!-- Leaderboard Section -->
-        <game-leader-board class="flex-1 min-h-0 overflow-auto"/>
+        <game-leader-board />
         <UDivider class="block lg:hidden" size="md"/>
         <!-- Medium Screen ONLY: Chat Section -->
         <game-chat
@@ -30,7 +30,7 @@
     <!-- Mobile Layout -->
     <div class="flex flex-col h-full w-full md:hidden min-h-0">
       <!-- Navbar -->
-      <div class="relative flex w-full h-8 justify-around items-center bg-gray-800 text-white">
+      <div class="relative flex w-full rounded-lg h-8 justify-around items-center bg-gray-800 text-white">
         <!-- Animated indicator -->
         <div class="absolute left-0 w-1/3 h-full rounded-lg bg-primary transition-transform duration-300"
         :style="{ transform: `translateX(${activeIndex*100}%)`}"/>
@@ -130,6 +130,10 @@ watch(error, () => {
 
 definePageMeta({
   middleware: ['auth', 'finished-game']
+})
+
+useHead({
+  title: 'Game Room'
 })
 
 // Display LOGIC

@@ -1,15 +1,11 @@
 import {NitroFetchOptions, NitroFetchRequest} from "nitropack";
-import {useFetch, type UseFetchOptions} from "#app";
+import {useFetch, useLazyFetch, type UseFetchOptions} from "#app";
 
 export function useFetchApi<T>(url: MaybeRefOrGetter<string>,
                                options?: UseFetchOptions<T>) {
 
     return useFetch<T>(url, {
         ...options,
-            headers: {
-                ...useRequestHeaders(['cookie']),
-                ...options?.headers,
-            },
         $fetch: useNuxtApp().$api as typeof $fetch,
     })
 }
@@ -18,10 +14,6 @@ export function useFetchApiLazy<T>(url: MaybeRefOrGetter<string>,
                                 options?: UseFetchOptions<T>) {
     return useLazyFetch<T>(url, {
         ...options,
-    headers: {
-    ...useRequestHeaders(['cookie']),
-    ...options?.headers,
-    },
         $fetch: useNuxtApp().$api as typeof $fetch,
     })
 }
@@ -52,9 +44,5 @@ export const fetchWithCookie = async (url: string, cookieName: string) => {
  */
 export function $api<T>(request: NitroFetchRequest, opts?: NitroFetchOptions<T>) {
     const { $api } = useNuxtApp()
-    if (!$api) {
-        console.error('why is API null???')
-    }
-
     return $api(request, opts) as typeof $fetch<T>
 }

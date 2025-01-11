@@ -4,22 +4,32 @@ import {useLocalStorage} from "@vueuse/core";
 
 export const useAuthStore = defineStore('useAuthStore', () => {
     const error = emit<string>(null)
-    const {data, error: meError, status, refresh} = useFetchApi<User>('/me', {immediate: false})
+    const {data, error: meError, status, refresh, clear } = useFetchApi<User>('/me', {immediate: false})
     const loading = computed(() => status.value === 'pending')
-    const user = useLocalStorage<User | null>('x-user', null, {
+    const storedUser = useLocalStorage<User | null>('x-user', null, {
         serializer: {
             read: (raw) => raw ? JSON.parse(raw) : null,
             write: (obj) => JSON.stringify(obj),
         }
     });
 
-    watch(data, () => {
-        user.value = data.value
+    const user = computed(() => {
+        if(import.meta.client) {
+            return storedUser.value
+        }
+        return data.value
     })
+
+    if (import.meta.client) {
+        storedUser.value = data.value
+        watch(data, () => {
+            storedUser.value = data.value
+        }, {})
+    }
 
     // functions
     const checkAuth = async () => {
-        await refresh({dedupe: 'defer'})
+        await refresh({dedupe: 'cancel'})
         if (meError.value) {
             error.value = `error checking authenticated user ${meError.value}`
         }
@@ -29,7 +39,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
         try {
             await authFactory.login(username, password);
             await checkAuth()
-            return !!user.value
+            // return !!storedUser.value
+            return data.value != null
         } catch (e) {
             error.value = `error logging in\n${e}`;
         }
@@ -47,6 +58,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     }
 
     const logout = async () => {
+        // storedUser.value = null;
+        clear();
         try {
             await authFactory.logout()
         } catch (e) {

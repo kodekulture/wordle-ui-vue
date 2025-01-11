@@ -4,9 +4,10 @@ import {useFetchApi} from "~/composables/use-fetch-api";
 import type {AsyncDataExecuteOptions} from "#app/composables/asyncData";
 
 export const useGamesStore = defineStore('useGamesStore',  () => {
-  const {data, error, refresh: _refresh, status } = useFetchApi<Game[]>('/room')
   const games = computed<Game[]>(() => data.value ?? [])
   const last_fetched = ref<Date | null>(null);
+  const {data, error, refresh: _refresh, status } = useFetchApi<Game[]>(`/room`, {cache: false})
+  const loading = computed(() => status.value === 'pending')
 
   async function refresh(opts?: AsyncDataExecuteOptions) {
     await _refresh(opts)
@@ -20,6 +21,7 @@ export const useGamesStore = defineStore('useGamesStore',  () => {
     games,
     last_fetched,
     error,
+    loading,
     refresh,
   }
 })
