@@ -1,5 +1,5 @@
 <template>
-  <guess-view v-if="true" :class="{shake: failedValidation}" :guess="guess" />
+  <guess-view v-if="true" :class="{shake: shaking}" :guess="guess" />
   <input type="text"
          ref="input"
          autofocus
@@ -19,6 +19,7 @@ const store = useGameStore()
 const { currentWord, playError, active } = storeToRefs(store);
 const guess = computed<WordGuess>(() => ({word: currentWord.value}))
 const input = ref<HTMLInputElement | null>(null)
+const shaking = computed(() => playError.value != null)
 
 function focusInput() {
   if (!input.value) {
@@ -38,12 +39,8 @@ function play() {
     showToastError('enter five letter word')
     return;
   }
-  if (!store.play()) {
-    showToastError('word was not sent, reload the webpage and try again')
-  }
+  store.play()
 }
-
-const failedValidation = computed(() => playError.value != null)
 
 function isLetter(e) {
   let char = String.fromCharCode(e.keyCode)
