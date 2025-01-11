@@ -1,11 +1,12 @@
 <template>
-<div class="flex flex-col items-center w-full overflow-auto grow-0 shrink">
+<div class="flex flex-col items-center w-full grow-0">
   <div v-for="row in rows" class="row">
     <game-key
         class="flex-shrink-0 flex-grow"
         v-for="l in row" :letter="l"
         :status="colors[l]"
-        :class="{width: l === 'ENTER' ? '2rem' : '1rem' }"
+        :disabled="play_status !== ''"
+        :class="l === 'ENTER' ? 'w-8' : 'w-4'"
         @click="update(l)" />
   </div>
 </div>
@@ -13,7 +14,14 @@
 
 <script setup lang="ts">
 const store = useGameStore()
-const { myGuesses, active, currentWord, playError } = storeToRefs(store)
+const { myGuesses, active, currentWord, playError, play_status, play_remaining, play_data } = storeToRefs(store)
+// TODO: animate play_remaining
+watch(play_data, () => {
+  if (play_data != null && !play_data.value) {
+    showToastError('word was not sent, try reloading the webpage and try again.')
+  }
+})
+
 const colors = computed(() => {
   const obj: Record<string, number> = {}
   myGuesses.value.forEach(guess => {
@@ -37,9 +45,7 @@ function play() {
     showError('enter five letter word')
     return;
   }
-  if (!store.play()) {
-    showError('word was not sent, reload the webpage and try again')
-  }
+  store.play()
 }
 function update(letter: string) {
   if (!active.value) {

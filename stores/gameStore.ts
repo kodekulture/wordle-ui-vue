@@ -1,9 +1,10 @@
 import {useRuntimeConfig} from '#app';
 import {defineStore, storeToRefs} from 'pinia';
-import {convertToWebSocketURL, WORD_LENGTH} from '~/utils'
-import type {Leaderboard, PlayerGuessResponse, WordGuess} from '~/api/game';
-import {type Game, gameFactory} from '~/api/game';
-import {useWebSocket} from "@vueuse/core";
+import {convertToWebSocketURL, DEBOUNCE_TIMER, WORD_LENGTH} from '~/utils'
+import type {Leaderboard, PlayerGuessResponse, WordGuess, Game} from '~/api/game';
+import { useWebSocket } from "@vueuse/core";
+import useCustomDebounce from "~/composables/use-custom-debounce";
+import {gameFactory} from "~/api/game";
 
 export const useGameStore = defineStore('useGameStore', () => {
     const gameId = ref<string | null>(null);
@@ -103,7 +104,6 @@ export const useGameStore = defineStore('useGameStore', () => {
                 playError.value = respon.data
                 break;
             case 'client/finish':
-                close()
                 msg = 'Game has already ended. You should start a new game with your friends and keep having fun 🤩.'
                 messages.value.push({from: 'server', data: msg})
                 break;
@@ -121,12 +121,13 @@ export const useGameStore = defineStore('useGameStore', () => {
         send(JSON.stringify({event: 'server/message', data: s}))
     }
 
-    const play = () => {
+    const {status: play_status, remaining: play_remaining, execute: play, data: play_data } = useCustomDebounce(() => {
         if (status.value !== 'OPEN') {
             return false
         }
-        return send(JSON.stringify({event: 'server/play', data: currentWord.value}), false)
-    }
+        const ts = new Date().toISOString()
+        return send(JSON.stringify({event: 'server/play', data: currentWord.value, key: ts}), false)
+    }, DEBOUNCE_TIMER)
 
     const reconnect = () => {
         console.log(gameId.value)
@@ -145,6 +146,9 @@ export const useGameStore = defineStore('useGameStore', () => {
         owner,
         myGuesses,
         playError,
+        play_status,
+        play_remaining,
+        play_data,
         join,
         start,
         message,
