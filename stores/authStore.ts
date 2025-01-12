@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia'
 import {authFactory} from '~/api/auth';
 import {useLocalStorage} from "@vueuse/core";
+import {FetchError} from "ofetch";
 
 export const useAuthStore = defineStore('useAuthStore', () => {
     const error = emit<string>(null)
@@ -43,8 +44,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
             await authFactory.login(username, password);
             await checkAuth()
             return data.value != null
-        } catch (e) {
-            error.value = `error logging in\n${e}`;
+        } catch (e: FetchError) {
+            error.value = `error logging in: ${errorMessage(e)}`;
         } finally {
             auth_loading.value = false
         }

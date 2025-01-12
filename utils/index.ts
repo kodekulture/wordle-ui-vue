@@ -11,6 +11,18 @@ export function showToastError(text: string) {
     })
 }
 
+export function errorMessage(error: FetchError): string {
+    try {
+        if (error.data) {
+            const obj: ServerError = JSON.parse(error.data)
+            return obj.message.join('\n')
+        }
+    } catch(f) {
+        console.log('omg', f)
+    }
+    return error.message
+}
+
 export function pluralize(text: string, count: number = 0): string {
     if (count === 1) {
         return text
@@ -54,4 +66,13 @@ const defaultOpts: EmitOpts = {
 
 export interface EmitOpts {
     resetAfter: number;
+}
+
+interface ServerError {
+    message: string[]
+    error: string
+}
+
+function isServerError(error: FetchError) {
+    return 'message' in error && 'error' in error
 }

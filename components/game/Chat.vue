@@ -47,7 +47,7 @@
 const {user} = storeToRefs(useAuthStore())
 const isMe = (username) => { return user.value.username === username }
 const store = useGameStore()
-const { messages, status } = storeToRefs(store) // TODO: show UI to trigger reconnection if status is CLOSED
+const { messages, status } = storeToRefs(store)
 const showReconnect = computed(() => status.value !== 'OPEN')
 const connecting = computed(() => status.value === 'CONNECTING')
 

@@ -34,12 +34,16 @@
         <!-- Animated indicator -->
         <div class="absolute left-0 w-1/3 h-full rounded-lg bg-primary transition-transform duration-300"
              :style="{ transform: `translateX(${activeIndex*100}%)`}"/>
-        <button v-for="(tab, index) in tabs" :key="index"
-                class="relative flex flex-1 items-center justify-center z-10 px-4 py-2"
-                @click="switchTab(index)"
-        >
-          {{ tab.text }}
+        <u-chip class="relative flex flex-1 items-center justify-center z-10 px-4 py-2" :text="missedLeaderboard"
+                size="2xl" :show="missedLeaderboard > 0" inset>
+          <button @click="switchTab(0)">Leaderboard</button>
+        </u-chip>
+        <button class="relative flex flex-1 items-center justify-center z-10 px-4 py-2" @click="switchTab(1)">Game
         </button>
+        <u-chip class="relative flex flex-1 items-center justify-center z-10 px-4 py-2" :text="missedMsgs" size="2xl"
+                :show="missedMsgs > 0" inset>
+          <button @click="switchTab(2)">Chat</button>
+        </u-chip>
       </div>
 
       <!-- Page Content -->
@@ -108,7 +112,7 @@ if (!finished) {
   store.join(id)
 }
 
-const {loading, status, error, active, owner} = storeToRefs(store)
+const {messages, leaderboard, loading, status, error, active, owner} = storeToRefs(store)
 const notActive = computed(() => !loading.value && !active.value)
 const ended = computed<boolean>(() => game.value?.ended_at != null)
 const showLoading = computed(() => ended.value ? false : loading.value)
@@ -139,11 +143,16 @@ useHead({
 // Display LOGIC
 const activePage = ref<'chat' | 'game' | 'leaderboard'>('game');
 const activeIndex = ref(1);
-const tabs = [{key: 'chat', text: 'Chat'}, {key: 'game', text: 'Game'}, {key: 'leaderboard', text: 'Leaderboard'}]
+const tabs = [{key: 'leaderboard', text: 'Leaderboard'}, {key: 'game', text: 'Game'}, {key: 'chat', text: 'Chat'},]
 const switchTab = (index: number) => {
   activePage.value = tabs[index].key;
   activeIndex.value = index;
 };
+
+/** CHATS */
+const {missed: missedMsgs} = useMissedEvent(messages, computed(() => activePage.value === 'chat'))
+/** LEADERBOARD */
+const {missed: missedLeaderboard} = useMissedEvent(leaderboard, computed(() => activePage.value === 'leaderboard'))
 </script>
 
 <style lang="scss">
