@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="z-10 fixed bottom-3 right-3 flex flex-col">
-      <UButton @click="createGame" :loading="create_loading" :disabled="create_loading" class="mb-4 rounded-xl justify-center">Create New Game</UButton>
+      <UButton @click="createGame" :loading="create_loading" class="mb-4 rounded-xl justify-center">Create New Game</UButton>
       <UButton @click="showModal = true" class="rounded-xl flex justify-center">Join Game</UButton>
     </div>
 
