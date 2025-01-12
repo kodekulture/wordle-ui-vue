@@ -100,6 +100,7 @@ import {storeToRefs} from 'pinia'
 import {computed} from 'vue'
 import {useRoute} from 'vue-router'
 import {useFinishedGameStore} from "~/stores/finishedGameStore";
+import {breakpointsTailwind} from "@vueuse/core";
 
 
 const {params, query} = useRoute()
@@ -149,10 +150,14 @@ const switchTab = (index: number) => {
   activeIndex.value = index;
 };
 
+const bp = useBreakpoints(breakpointsTailwind)
+const greaterThanSm = bp.greater('sm')
 /** CHATS */
-const {missed: missedMsgs} = useMissedEvent(messages, computed(() => activePage.value === 'chat'))
+const {missed: missedMsgs} = useMissedEvent(messages,
+    computed(() => activePage.value === 'chat' || greaterThanSm.value))
 /** LEADERBOARD */
-const {missed: missedLeaderboard} = useMissedEvent(leaderboard, computed(() => activePage.value === 'leaderboard'))
+const {missed: missedLeaderboard} = useMissedEvent(leaderboard,
+    computed(() => activePage.value === 'leaderboard' || greaterThanSm.value))
 </script>
 
 <style lang="scss">
