@@ -6,7 +6,7 @@
         <guess-view :guess="guess" />
         </li>
         <li v-if="showInput">
-          <guess-input ref="input" :disabled="ended" />
+          <guess-input :disabled="ended" />
         </li>
         <li v-for="i in guessesLeft" :key="`remaining-guess-${i}`">
           <guess-view :guess="{}" />
@@ -25,7 +25,6 @@ import type {GuessInput} from "#components";
 const props = defineProps<{game: Game | null}>()
 
 // refs
-const input = ref(null)
 const store = useGameStore()
 const { myGuesses } = storeToRefs(store);
 const guesses = computed(() => {
@@ -38,10 +37,4 @@ const guesses = computed(() => {
 const guessesLeft = computed(() => Math.max(0, MAX_GUESSES - guesses.value.length - 1))
 const showInput = computed(() => MAX_GUESSES > guesses.value.length)
 const ended = computed<boolean>(() => props.game?.ended_at != null)
-
-function focusInput() {
-  if (input?.value && !ended.value) {
-    input?.value.focusInput()
-  }
-}
 </script>
