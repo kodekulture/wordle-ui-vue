@@ -1,8 +1,10 @@
 import {useFinishedGameStore} from "~/stores/finishedGameStore";
+import {useGameStore} from "~/stores/gameStore";
 
 export default defineNuxtRouteMiddleware(async (to) => {
-    const store = useFinishedGameStore()
-    const { game } = storeToRefs(store)
+    const finishedStore = useFinishedGameStore()
+    const store = useGameStore()
+    const { game } = storeToRefs(finishedStore)
 
     const id = to.params?.id
     const isFinished = to.query.finished != null
@@ -10,8 +12,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (!id) {
         return abortNavigation('game must have a valid id')
     }
-
-    await store.load(id)
+    
+    await finishedStore.load(id)
+    store.$reset()
 
     const actualFinish = game.value?.ended_at != null
     if (!isFinished && actualFinish) {
