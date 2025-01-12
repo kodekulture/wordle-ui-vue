@@ -12,8 +12,8 @@
           <UButton class="px-1 h-auto md:px-6 md:h-10" @click="logout">Logout</UButton>
         </div>
         <div v-else class="flex-1 flex flex-row items-center justify-end">
-          <nuxt-link to="/login"><Button>Login</Button></nuxt-link>
-          <nuxt-link to="/register"><Button>Register</Button></nuxt-link>
+          <nuxt-link to="/login"><UButton>Login</UButton></nuxt-link>
+          <nuxt-link to="/register"><UButton>Register</UButton></nuxt-link>
         </div>
       </div>
     </div>

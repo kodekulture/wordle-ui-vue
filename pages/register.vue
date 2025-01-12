@@ -10,7 +10,7 @@
           <label for="password">Password:</label>
           <UInput type="password" id="password" name="password" v-model='obj.password' />
       </div>
-      <UButton type="submit" :disabled="loading" class="w-44 justify-center">Register</UButton>
+      <UButton type="submit" :disabled="auth_loading" :loading="auth_loading" class="w-44 justify-center">Register</UButton>
       </div>
     </form>
     <UButton @click="toLogin" class="w-44 justify-center">Login instead?</UButton>
@@ -25,7 +25,7 @@ const obj = ref({
 })
 const store = useAuthStore();
 
-const { loading, error } = storeToRefs(store);
+const { auth_loading, error } = storeToRefs(store);
 watch(error, () => {
   if (error.value) {
     showToastError(error.value)
@@ -34,7 +34,7 @@ watch(error, () => {
 
 async function register() {
   const v = obj.value
-  const result = await store.register(v.username, v.password);
+  const result = await store.register(v.username.trim(), v.password);
   if (result) {
     navigateTo('/')
   }

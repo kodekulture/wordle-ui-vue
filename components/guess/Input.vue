@@ -1,22 +1,23 @@
 <template>
-  <guess-view v-if="true" :class="{shake: shaking}" :guess="guess" />
-  <input type="text"
-         ref="input"
-         autofocus
-         v-model="currentWord"
-         @keydown.enter="play"
-         @keydown="isLetter($event)"
-         :disabled="disabled"
-         :maxlength="WORD_LENGTH"
-  />
+    <guess-view :class="{shake: shaking}" :guess="guess"/>
+    <input type="text"
+           ref="input"
+           autofocus
+           v-model="currentWord"
+           @keydown.enter="play"
+           @keydown="isLetter($event)"
+           :disabled="disabled"
+           :maxlength="WORD_LENGTH"/>
+  <UProgress v-if="play_status === 'debouncing'" :value="DEBOUNCE_TIMER - play_remaining" :max="DEBOUNCE_TIMER"/>
+  <UProgress animation="carousel" v-else-if="play_status === 'executing'"/>
 </template>
 
 <script setup lang="ts">
-defineProps<{disabled: boolean}>()
-defineExpose({ focusInput })
+defineProps<{ disabled: boolean }>()
+defineExpose({focusInput})
 
 const store = useGameStore()
-const { currentWord, playError, active } = storeToRefs(store);
+const {currentWord, playError, play_status, play_remaining, active} = storeToRefs(store);
 const guess = computed<WordGuess>(() => ({word: currentWord.value}))
 const input = ref<HTMLInputElement | null>(null)
 const shaking = computed(() => playError.value != null)
@@ -55,6 +56,7 @@ function isLetter(e) {
 input {
   @apply absolute opacity-0;
 }
+
 .shake {
   animation: shake;
   animation-duration: 100ms;

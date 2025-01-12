@@ -5,7 +5,6 @@
         class="flex-shrink-0 flex-grow"
         v-for="l in row" :letter="l"
         :status="colors[l]"
-        :disabled="play_status !== ''"
         :class="l === 'ENTER' ? 'w-8' : 'w-4'"
         @click="update(l)" />
   </div>
@@ -15,9 +14,8 @@
 <script setup lang="ts">
 const store = useGameStore()
 const { myGuesses, active, currentWord, playError, play_status, play_remaining, play_data } = storeToRefs(store)
-// TODO: animate play_remaining
 watch(play_data, () => {
-  if (play_data != null && !play_data.value) {
+  if (play_data.value != null && !play_data.value) {
     showToastError('word was not sent, try reloading the webpage and try again.')
   }
 })

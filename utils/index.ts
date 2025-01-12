@@ -1,6 +1,6 @@
 export const WORD_LENGTH: number = 5;
 export const MAX_GUESSES: number = 6;
-export const DEBOUNCE_TIMER = 1000;
+export const DEBOUNCE_TIMER = 500;
 
 export function showToastError(text: string) {
     const toast = useToast()
@@ -9,6 +9,18 @@ export function showToastError(text: string) {
         color: 'red',
         icon: 'i-heroicons-solid-exclamation-triangle',
     })
+}
+
+export function errorMessage(error: FetchError): string {
+    try {
+        if (error.data) {
+            const obj: ServerError = JSON.parse(error.data)
+            return obj.message.join('\n')
+        }
+    } catch(f) {
+        console.log('omg', f)
+    }
+    return error.message
 }
 
 export function pluralize(text: string, count: number = 0): string {
@@ -54,4 +66,13 @@ const defaultOpts: EmitOpts = {
 
 export interface EmitOpts {
     resetAfter: number;
+}
+
+interface ServerError {
+    message: string[]
+    error: string
+}
+
+function isServerError(error: FetchError) {
+    return 'message' in error && 'error' in error
 }

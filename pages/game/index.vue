@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="z-10 fixed bottom-3 right-3 flex flex-col">
-      <UButton @click="createGame" class="mb-4 rounded-xl justify-center">Create New Game</UButton>
+      <UButton @click="createGame" :loading="create_loading" :disabled="create_loading" class="mb-4 rounded-xl justify-center">Create New Game</UButton>
       <UButton @click="showModal = true" class="rounded-xl flex justify-center">Join Game</UButton>
     </div>
 
@@ -41,7 +41,7 @@
 import {useCreateGameStore,useGamesStore} from "~/stores/gamesStore";
 
 const gamesStore = useGamesStore()
-const { games, error, last_fetched, loading, status: fetch_status } = storeToRefs(gamesStore);
+const { games, error, last_fetched, loading } = storeToRefs(gamesStore);
 watch(error, () => {
   if (error.value) {
     showToastError(`Failed to fetch game lists\n${error.value}`)
@@ -49,9 +49,9 @@ watch(error, () => {
 })
 
 const createGameStore = useCreateGameStore()
-const { id: newGameId, error: create_error } = storeToRefs(createGameStore)
+const { id: newGameId, error: create_error, loading: create_loading } = storeToRefs(createGameStore)
 const createGame = async () => {
-  await createGameStore.refresh()
+  await createGameStore.create()
   if (newGameId.value) {
     console.log(`new Game ${newGameId.value}`)
     await navigateTo(`/game/${newGameId.value}`)

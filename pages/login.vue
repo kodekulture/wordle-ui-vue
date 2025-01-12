@@ -6,7 +6,7 @@ const obj = ref({
 })
 const store = useAuthStore();
 
-const { loading, error } = storeToRefs(store);
+const { auth_loading, error } = storeToRefs(store);
 watch(error, () => {
   if (error.value == null) return;
   showToastError(error.value)
@@ -16,7 +16,7 @@ const toRegister = () => navigateTo('/register');
 
 async function login() {
     const v = obj.value
-    const success = await store.login(v.username, v.password);
+    const success = await store.login(v.username.trim(), v.password);
     if (success) {
         navigateTo('/')
     }
@@ -26,8 +26,9 @@ definePageMeta({
     layout: 'auth',
 })
 useHead({
-  title: 'Login'
+  title: 'Login',
 })
+
 </script>
 <template>
     <CenterBox title="Login to Wordle With Friends">
@@ -41,7 +42,7 @@ useHead({
                   <label for="password">Password:</label>
                   <UInput v-model="obj.password" id='password' type='password' name='password' />
               </div>
-              <UButton type="submit" :disabled="loading" :loading="loading" @click="login" class="w-44 justify-center">Login</UButton>
+              <UButton type="submit" :disabled="auth_loading" :loading="auth_loading" @click="login" class="w-44 justify-center">Login</UButton>
         </div>
         </form>
         <UButton @click="toRegister" class="w-44 justify-center"> Register instead? </UButton>

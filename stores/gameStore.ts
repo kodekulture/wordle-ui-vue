@@ -36,8 +36,8 @@ export const useGameStore = defineStore('useGameStore', () => {
     const leaderboard = ref<Leaderboard>([]);
 
 
-    const {status, data, open, send} = useWebSocket(socketURL,
-        {immediate: false })
+    const {status, data, send} = useWebSocket(socketURL,
+        { immediate: false })
     watch(status, () => {
         console.log(`The current status is ${status.value}`);
     })
@@ -50,7 +50,6 @@ export const useGameStore = defineStore('useGameStore', () => {
             const {token} = await gameFactory.joinRoom(id);
             gameId.value = id;
             joinToken.value = token;
-            open()
         } catch (e) {
             console.error(e);
             error.value = 'failed to join game'
