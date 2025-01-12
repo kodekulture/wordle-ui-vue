@@ -78,8 +78,13 @@
     </div>
   </UModal>
   <UModal v-model="showStart" prevent-close>
-    <div :hidden="!notActive">
+    <div v-if="notActive">
       <div class="p-4 w-full h-full z-50">
+        <div class="flex flex-wrap w-full items-center">
+          <TransitionGroup name="list"></TransitionGroup>
+          <p>Players: </p>
+          <UBadge v-for="gamer in players" :label="gamer" :key="gamer" class="m-1" :icon="gamer === gameOwner ? 'i-heroicons-rocket-launch' : ''" />
+        </div>
         <div v-if="owner" class="flex flex-col items-center justify-center h-full">
           <span class="mb-4">Players are waiting for you to start the game...</span>
           <UButton @click="store.start">Start</UButton>
@@ -89,6 +94,9 @@
           <UProgress animation="carousel"/>
         </div>
       </div>
+    </div>
+    <div v-else class="flex items-center justify-center">
+      An error occurred, please try again later.
     </div>
   </UModal>
 </template>
@@ -102,7 +110,6 @@ import {useRoute} from 'vue-router'
 import {useFinishedGameStore} from "~/stores/finishedGameStore";
 import {breakpointsTailwind} from "@vueuse/core";
 
-
 const {params, query} = useRoute()
 const id = params.id
 const finished = query.finished
@@ -113,7 +120,7 @@ if (!finished) {
   store.join(id)
 }
 
-const {messages, leaderboard, loading, status, error, active, owner} = storeToRefs(store)
+const {messages, leaderboard, loading, status, error, active, owner, gameOwner, players} = storeToRefs(store)
 const notActive = computed(() => !loading.value && !active.value)
 const ended = computed<boolean>(() => game.value?.ended_at != null)
 const showLoading = computed(() => ended.value ? false : loading.value)
@@ -141,6 +148,7 @@ useHead({
   title: 'Game Room'
 })
 
+// TODO: show join and leave information and compute the list of users in the lobby
 // Display LOGIC
 const activePage = ref<'chat' | 'game' | 'leaderboard'>('game');
 const activeIndex = ref(1);
@@ -170,5 +178,16 @@ const {missed: missedLeaderboard} = useMissedEvent(leaderboard,
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 </style>
