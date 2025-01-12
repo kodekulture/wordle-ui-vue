@@ -8,15 +8,21 @@ export const useFinishedGameStore = defineStore('useFinishedGameStore', () => {
     const error = ref<string | null>(null);
 
     async function load(id: string) {
-        loading.value = true;
-        error.value = null;
+        $reset()
         try {
+            loading.value = true;
             game.value = await gameFactory.room(id)
         } catch (e) {
             error.value = `Failed to retrieve game data for id: ${id}`
         } finally {
             loading.value = false;
         }
+    }
+
+    const $reset = () => {
+        game.value = null;
+        loading.value = false;
+        error.value = null;
     }
 
     return {

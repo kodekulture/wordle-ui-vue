@@ -14,6 +14,24 @@ export const useGameStore = defineStore('useGameStore', () => {
     const _loading = ref(true);
     const active = ref(false);
     const gameOwner = ref<string | null>(null);
+    const messages = ref<Message[]>([]);
+    const _word = ref<string | null>(null);
+    const myGuesses = ref<WordGuess[]>([]);
+    const leaderboard = ref<Leaderboard>([]);
+
+    const $reset = () => {
+        myGuesses.value = [];
+        leaderboard.value = [];
+        messages.value = [];
+        _word.value = null;
+        gameOwner.value = null;
+        active.value = false;
+        _loading.value = true;
+        error.value = null;
+        gameId.value = null;
+        joinToken.value = null;
+    }
+
     const config = useRuntimeConfig();
 
     const socketURL = computed(() => `${convertToWebSocketURL(config.public.baseURL)}/live?token=${joinToken.value}`)
@@ -21,8 +39,6 @@ export const useGameStore = defineStore('useGameStore', () => {
     const owner = computed(() => gameOwner.value == null ||
     user.value?.username == null ? null : gameOwner.value === user.value?.username)
 
-    const messages = ref<Message[]>([]);
-    const _word = ref<string | null>(null);
     const currentWord = computed<string>({
         set: (v: string) => {
             if (v.length > WORD_LENGTH) {
@@ -32,8 +48,6 @@ export const useGameStore = defineStore('useGameStore', () => {
         },
         get: () => _word.value ?? '',
     })
-    const myGuesses = ref<WordGuess[]>([]);
-    const leaderboard = ref<Leaderboard>([]);
 
 
     const {status, data, send} = useWebSocket(socketURL,
@@ -152,6 +166,7 @@ export const useGameStore = defineStore('useGameStore', () => {
         start,
         message,
         play,
+        $reset,
         reconnect,
     }
 })
