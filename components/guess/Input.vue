@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 defineProps<{ disabled: boolean }>()
-defineExpose({focusInput})
 
 const store = useGameStore()
 const {currentWord, playError, play_status, play_remaining, active} = storeToRefs(store);
@@ -22,14 +21,10 @@ const guess = computed<WordGuess>(() => ({word: currentWord.value}))
 const input = ref<HTMLInputElement | null>(null)
 const shaking = computed(() => playError.value != null)
 
-function focusInput() {
-  if (!input.value) {
-    return
-  }
-  if (input.value && document.activeElement !== input.value) {
-    input.value?.focus()
-  }
-}
+onStartTyping(() => {
+  if (!input.value.active)
+    input.value.focus()
+})
 
 function play() {
   if (!active.value) {
