@@ -1,14 +1,11 @@
 import { $api } from "~/composables/use-fetch-api";
 
 export const gameFactory = {
-    createRoom() {
-        return $api<{ id: string }>('/room', {method: 'POST'})
+    createRoom<T extends {id: string}>(): Promise<T> {
+        return $api<T>('/room', {method: 'POST'})
     },
-    joinRoom(id: string) {
-        return $api<{ token: string }>(`/join/room/${id}`)
-    },
-    rooms() {
-        return $api<Game[]>(`/room`)
+    joinRoom<T extends {token: string}>(id: string): Promise<T> {
+        return $api<T>(`/join/room/${id}`)
     },
     room(roomid: string) {
         return $api<Game>(`/room/${roomid}`);

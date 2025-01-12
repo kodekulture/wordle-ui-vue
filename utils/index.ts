@@ -1,6 +1,6 @@
 export const WORD_LENGTH: number = 5;
 export const MAX_GUESSES: number = 6;
-export const DEBOUNCE_TIMER = 1000;
+export const DEBOUNCE_TIMER = 500;
 
 export function showToastError(text: string) {
     const toast = useToast()

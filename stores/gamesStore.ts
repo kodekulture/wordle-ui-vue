@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { type Game } from '~/api/game';
+import {type Game, gameFactory} from '~/api/game';
 import {useFetchApi} from "~/composables/use-fetch-api";
 import type {AsyncDataExecuteOptions} from "#app/composables/asyncData";
 
@@ -27,11 +27,22 @@ export const useGamesStore = defineStore('useGamesStore',  () => {
 })
 
 export const useCreateGameStore = defineStore('createGameStore', () => {
-  const { data, status, error, refresh } = useFetchApiLazy<{id: string}>('/room', {
-    method: 'POST',
-    immediate: false,
-    cache: false,
-  })
+  const loading = ref(false)
+  const error = emit<string>(null)
+  const data = ref<{id: string}>(null)
+
+  const create = async () => {
+    try {
+      loading.value = true
+      const { id } = await gameFactory.createRoom()
+      data.value = {id}
+    } catch(e: Error) {
+      error.value = e.message
+    } finally {
+      loading.value = false
+    }
+  }
+
   const id = computed<string | null>(() => data.value?.id)
   watch(data, () => {
     console.log(`Data from createGame ${JSON.stringify(data.value)} ${Date.now()}`)
@@ -39,7 +50,7 @@ export const useCreateGameStore = defineStore('createGameStore', () => {
   return {
     id,
     error,
-    status,
-    refresh,
+    loading,
+    create,
   }
 })

@@ -12,7 +12,7 @@
       <!-- Medium Screen Layout: Chat and Leaderboard Stacked Vertical -->
       <div class="hidden md:flex md:flex-col md:w-1/2 lg:w-1/4 min-h-0">
         <!-- Leaderboard Section -->
-        <game-leader-board />
+        <game-leader-board/>
         <UDivider class="block lg:hidden" size="md"/>
         <!-- Medium Screen ONLY: Chat Section -->
         <game-chat
@@ -33,30 +33,30 @@
       <div class="relative flex w-full rounded-lg h-8 justify-around items-center bg-gray-800 text-white">
         <!-- Animated indicator -->
         <div class="absolute left-0 w-1/3 h-full rounded-lg bg-primary transition-transform duration-300"
-        :style="{ transform: `translateX(${activeIndex*100}%)`}"/>
+             :style="{ transform: `translateX(${activeIndex*100}%)`}"/>
         <button v-for="(tab, index) in tabs" :key="index"
                 class="relative flex flex-1 items-center justify-center z-10 px-4 py-2"
-            @click="switchTab(index)"
+                @click="switchTab(index)"
         >
-          {{tab.text}}
+          {{ tab.text }}
         </button>
       </div>
 
       <!-- Page Content -->
       <div class="min-h-0 flex-1 grow overflow-auto">
         <transition name="fade" mode="out-in">
-        <div v-if="activePage === 'chat'" class="h-full min-h-0 overflow-auto" key="chat">
-          <div v-if="ended">
-            Game has Ended
+          <div v-if="activePage === 'chat'" class="h-full min-h-0 overflow-auto" key="chat">
+            <div v-if="ended">
+              Game has Ended
+            </div>
+            <game-chat v-else/>
           </div>
-          <game-chat v-else />
-        </div>
-        <div v-else-if="activePage === 'game'" class="h-full min-h-0 overflow-auto" key="game">
-          <game-board :game="game"/>
-        </div>
-        <div v-else-if="activePage === 'leaderboard'" class="h-full min-h-0 overflow-auto" key="leaderboard">
-          <game-leader-board/>
-        </div>
+          <div v-else-if="activePage === 'game'" class="h-full min-h-0 overflow-auto" key="game">
+            <game-board :game="game"/>
+          </div>
+          <div v-else-if="activePage === 'leaderboard'" class="h-full min-h-0 overflow-auto" key="leaderboard">
+            <game-leader-board/>
+          </div>
         </transition>
       </div>
     </div>
@@ -121,7 +121,7 @@ const showError = computed<boolean>(() => shownError.value != null)
 const showStart = computed<boolean>(() => !active.value &&
     !showError.value &&
     !showLoading.value &&
-status.value === 'OPEN')
+    status.value === 'OPEN')
 
 watch(error, () => {
   if (error.value == null) return;
@@ -152,6 +152,7 @@ const switchTab = (index: number) => {
 .fade-leave-active {
   transition: opacity 0.3s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

@@ -1,5 +1,5 @@
 <template>
-    <div class="p-2 flex flex-wrap">
+    <div class="p-2 flex w-full h-full items-center justify-center flex-wrap">
         <IconButton link="/game" text="Games" />
         <!-- <IconButton link="#" text="Settings" />
         <IconButton link="#" />
