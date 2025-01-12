@@ -18,6 +18,7 @@ export const useGameStore = defineStore('useGameStore', () => {
     const _word = ref<string | null>(null);
     const myGuesses = ref<WordGuess[]>([]);
     const leaderboard = ref<Leaderboard>([]);
+    const players = ref<Set<string>>(new Set())
 
     const $reset = () => {
         myGuesses.value = [];
@@ -30,6 +31,7 @@ export const useGameStore = defineStore('useGameStore', () => {
         error.value = null;
         gameId.value = null;
         joinToken.value = null;
+        players.value = new Set();
     }
 
     const config = useRuntimeConfig();
@@ -85,6 +87,12 @@ export const useGameStore = defineStore('useGameStore', () => {
             case 'client/message':
                 messages.value.push(obj as Message);
                 break;
+            case 'client/join':
+                players.value.add(obj.from)
+                break;
+            case 'client/leave':
+                players.value.delete(obj.from)
+                break;
             case 'client/play':
                 const response = obj as Play
                 leaderboard.value = response.data.leaderboard
@@ -110,6 +118,9 @@ export const useGameStore = defineStore('useGameStore', () => {
                 active.value = respons.data.active
                 gameOwner.value = respons.data.creator
                 myGuesses.value = respons.data.guesses ?? []
+                const arr = (respons.data.game_performance ?? [])
+                arr.forEach(player => players.value.add(player.username))
+
                 console.log(`game is active?: ${respons.data.active}`)
                 break;
             case 'client/error':
@@ -157,6 +168,8 @@ export const useGameStore = defineStore('useGameStore', () => {
         leaderboard,
         active,
         owner,
+        players,
+        gameOwner,
         myGuesses,
         playError,
         play_status,
