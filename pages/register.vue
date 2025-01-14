@@ -4,11 +4,11 @@
       <div class="flex flex-col my-4 justify-center items-center">
       <div class="my-2">
           <label for="username">Username:</label>
-          <UInput type="text" id="username" name="username" v-model="obj.username" />
+          <UInput type="text" id="username" name="username" v-model="obj.username" autocomplete="username" />
       </div>
       <div class="mb-8">
           <label for="password">Password:</label>
-          <UInput type="password" id="password" name="password" v-model='obj.password' />
+          <UInput type="password" id="password" name="password" v-model='obj.password' autocomplete="new-password" />
       </div>
       <UButton type="submit" :disabled="auth_loading" :loading="auth_loading" class="w-44 justify-center">Register</UButton>
       </div>

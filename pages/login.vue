@@ -36,11 +36,11 @@ useHead({
             <div class="flex flex-col my-4 justify-center items-center">
               <div class="my-2">
                   <label for="username">Username:</label>
-                  <UInput v-model="obj.username" id="username" name="username" variant="outline" />
+                  <UInput v-model="obj.username" id="username" name="username" variant="outline" autocomplete="username" />
               </div>
               <div class="mb-8">
                   <label for="password">Password:</label>
-                  <UInput v-model="obj.password" id='password' type='password' name='password' />
+                  <UInput v-model="obj.password" id='password' type='password' name='password' autocomplete="current-password" />
               </div>
               <UButton type="submit" :disabled="auth_loading" :loading="auth_loading" @click="login" class="w-44 justify-center">Login</UButton>
         </div>
