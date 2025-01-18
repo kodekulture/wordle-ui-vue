@@ -12,17 +12,7 @@
     Empty list of games
   </div>
   <div v-else v-for="game in games">
-    <div class="p-2 m-2 border border-gray-500 flex flex-row items-center" @click="joinExisting(game.id)">
-      <div class="p-2">
-        <div class="text-ellipsis text-xl">{{ game.id }}</div>
-        <div class="text-lg font-bold font-serif">{{ game.creator }}</div>
-      </div>
-      <div v-if="game.ended_at" class="flex flex-col">
-        <span>
-          Finished at {{ game.ended_at }}
-        </span>
-        </div>
-      </div>
+    <list-item :game="game" />
     </div>
     <div class="z-10 fixed bottom-3 right-3 flex flex-col">
       <UButton @click="createGame" :loading="create_loading" class="mb-4 rounded-xl justify-center">Create New Game</UButton>
@@ -39,6 +29,7 @@
 
 <script lang="ts" setup>
 import {useCreateGameStore,useGamesStore} from "~/stores/gamesStore";
+import ListItem from "~/components/game/ListItem.vue";
 
 const gamesStore = useGamesStore()
 const { games, error, last_fetched, loading } = storeToRefs(gamesStore);
@@ -63,7 +54,6 @@ const createGame = async () => {
 const showModal = ref(false)
 const gid = ref('')
 const joinGame = async () => await navigateTo(`/game/${gid.value}`)
-const joinExisting = async (id) => await navigateTo(`/game/${id}?finished=true`)
 
 const updated = computed(() => last_fetched?.value.toString())
 

@@ -12,7 +12,7 @@
       <!-- Medium Screen Layout: Chat and Leaderboard Stacked Vertical -->
       <div class="hidden md:flex md:flex-col md:w-1/2 lg:w-1/4 min-h-0">
         <!-- Leaderboard Section -->
-        <game-leader-board/>
+        <game-leaderboard/>
         <UDivider class="block lg:hidden" size="md"/>
         <!-- Medium Screen ONLY: Chat Section -->
         <game-chat
@@ -59,7 +59,7 @@
             <game-board :game="game"/>
           </div>
           <div v-else-if="activePage === 'leaderboard'" class="h-full min-h-0 overflow-auto" key="leaderboard">
-            <game-leader-board/>
+            <game-leaderboard/>
           </div>
         </transition>
       </div>

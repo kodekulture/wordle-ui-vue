@@ -5,19 +5,7 @@
   </div>
   <ul class="list-none p-0 m-0 relative">
     <transition-group tag="ul" name="rank">
-    <li
-        class="p-2 bg-gray-800 m-1 rounded-lg flex flex-wrap items-center"
-        v-for="summary in leaderboard" :key="`${summary.username}`">
-      <div>
-        <span class="rank">#{{ summary.rank + 1 }}</span>
-        <span class="mx-2 text-white"> {{ summary.username }}</span>
-        <span class="text-sm font-mono text-gray-400 tracking-tight">{{ summary.words_played }} {{ pluralize('guess', summary.words_played) }}</span>
-      </div>
-      <div class="flex flex-nowrap ml-auto mr-0">
-      <div v-for="st in status(summary.best.status)"
-            class="box size-4 m-0 p-0 border border-solid" :data-status="st" />
-      </div>
-    </li>
+      <best-guess-bar :leaderboard="leaderboard" />
     </transition-group>
   </ul>
 </template>
@@ -26,7 +14,7 @@
 import { useGameStore} from "~/stores/gameStore";
 import { useFinishedGameStore} from "~/stores/finishedGameStore";
 import { useAuthStore} from "~/stores/authStore";
-import { pluralize } from "~/utils";
+import BestGuessBar from "~/components/game/leaderboard/BestGuessBar.vue";
 
 // general
 const statuses = {1: 'incorrect', 2: 'almost', 3: 'correct'}

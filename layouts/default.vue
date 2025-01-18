@@ -1,6 +1,6 @@
 <template>
   <header class="bg-white dark:bg-gray-900">
-    <nav class="fixed w-full flex flex-nowrap bg-white dark:bg-gray-900 z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+    <nav class="fixed w-full flex flex-nowrap bg-white dark:bg-gray-900 z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600 p-1">
       <div class="flex flex-nowrap flex-1 items-center justify-between mx-auto px-1 md:px-4 py-1">
         <NuxtLink to="/" class="-m-1.5 p-1.5 flex flex-row">
           <img class="h-8 w-auto px-2" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="" />
@@ -19,7 +19,7 @@
     </div>
     </nav>
   </header>
-  <div class="pt-[48px] h-screen">
+  <div class="pt-[52px] h-screen">
     <slot />
   </div>
 </template>
